@@ -18,9 +18,9 @@ bumperbot_controller:
     use_stamped_vel: true
 
     left_wheel_names:
-      - bumperbot/wheel_left_joint
+      - bumperbot_2/wheel_left_joint
     right_wheel_names:
-      - bumperbot/wheel_right_joint
+      - bumperbot_2/wheel_right_joint
 
     publish_rate: 50.0
     pose_covariance_diagonal: [0.001, 0.001, 1.0e-3, 1.0e-3, 1.0e-3, 0.01]
@@ -35,7 +35,7 @@ bumperbot_controller:
 
     cmd_vel_timeout: 0.5
 
-    base_frame_id: bumperbot/base_footprint
+    base_frame_id: bumperbot_2/base_footprint
 
     publish_limited_velocity: true
     publish_wheel_data: true
@@ -67,5 +67,5 @@ bumperbot_controller:
 simple_velocity_controller:
   ros__parameters:
     joints:
-      - bumperbot/wheel_left_joint
-      - bumperbot/wheel_right_joint
+      - bumperbot_2/wheel_left_joint
+      - bumperbot_2/wheel_right_joint

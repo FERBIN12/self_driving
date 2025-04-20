@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="${namespace}">
+
+  <ros2_control name="${namespace}_controller" type="system">
+
+    <!-- Simulated robot -->
+    <xacro:if value="$(arg is_sim)">
+      <!-- Gazebo/Ignition plugin selection -->
+      <xacro:if value="$(arg is_ignition)">
+        <hardware>
+          <plugin>ign_ros2_control/IgnitionSystem</plugin>
+        </hardware>
+      </xacro:if>
+
+      <xacro:unless value="$(arg is_ignition)">
+        <hardware>
+          <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </hardware>
+      </xacro:unless>
+    </xacro:if>
+
+    <!-- Real robot -->
+    <xacro:unless value="$(arg is_sim)">
+      <hardware>
+        <plugin>bumperbot_firmware/BumperbotInterface</plugin>
+        <param name="port">/dev/ttyUSB0</param>
+      </hardware>
+    </xacro:unless>
+
+    <!-- Control interfaces for joints -->
+    <joint name="${namespace}/wheel_right_joint">
+      <command_interface name="velocity">
+        <param name="min">-1.0</param>
+        <param name="max">1.0</param>
+      </command_interface>
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+
+    <joint name="${namespace}/wheel_left_joint">
+      <command_interface name="velocity">
+        <param name="min">-1.0</param>
+        <param name="max">1.0</param>
+      </command_interface>
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+    </joint>
+
+  </ros2_control>
+
+</robot>

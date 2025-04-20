@@ -1,0 +1,207 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="${namespace}">
+
+  <!-- Arguments -->
+  <xacro:arg name="is_ignition" default="true"/>
+  <xacro:arg name="is_sim" default="true"/>
+  <xacro:arg name="namespace" default="bumperbot_2"/>
+
+  <!-- Includes -->
+  <xacro:include filename="$(find bumperbot_description)/urdf/bumperbot_gazebo.xacro"/>
+  <xacro:include filename="$(find bumperbot_description)/urdf/bumperbot_ros2_control.xacro"/>
+
+  <!-- Base -->
+  <link name="${namespace}/base_footprint"/>
+  <link name="${namespace}/base_link">
+    <inertial>
+      <origin xyz="0 0 0.04" rpy="0.0 0.25 0.3" />
+      <mass value="0.82573504"/>
+      <inertia ixx="0.0221" ixy="-0.0001" ixz="0.0003"
+               iyy="0.0211" iyz="-0.00005"
+               izz="0.0200"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://bumperbot_description/meshes/base_link.STL"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://bumperbot_description/meshes/base_link.STL"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="${namespace}/base_joint" type="fixed">
+    <parent link="${namespace}/base_footprint"/>
+    <child link="${namespace}/base_link"/>
+    <origin xyz="0 0 0.033" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Right Wheel -->
+  <link name="${namespace}/wheel_right_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57 0 0"/>
+      <geometry>
+        <mesh filename="package://bumperbot_description/meshes/wheel_right_link.STL"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.033"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="${namespace}/wheel_right_joint" type="continuous">
+    <origin xyz="0 -0.0701 0" rpy="0 0 0"/>
+    <parent link="${namespace}/base_link"/>
+    <child link="${namespace}/wheel_right_link"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- Left Wheel -->
+  <link name="${namespace}/wheel_left_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="-1.57 0 0"/>
+      <geometry>
+        <mesh filename="package://bumperbot_description/meshes/wheel_left_link.STL"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.033"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="${namespace}/wheel_left_joint" type="continuous">
+    <origin xyz="0 0.0701 0" rpy="0 0 0"/>
+    <parent link="${namespace}/base_link"/>
+    <child link="${namespace}/wheel_left_link"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <!-- Caster Front -->
+  <link name="${namespace}/caster_front_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://bumperbot_description/meshes/caster_front_link.STL"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="${namespace}/caster_front_joint" type="fixed">
+    <origin xyz="0.04755 0 -0.0275" rpy="0 0 0"/>
+    <parent link="${namespace}/base_link"/>
+    <child link="${namespace}/caster_front_link"/>
+  </joint>
+
+  <!-- Caster Rear -->
+  <link name="${namespace}/caster_rear_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://bumperbot_description/meshes/caster_rear_link.STL"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.005"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="${namespace}/caster_rear_joint" type="fixed">
+    <origin xyz="-0.04755 0 -0.0275" rpy="0 0 0"/>
+    <parent link="${namespace}/base_link"/>
+    <child link="${namespace}/caster_rear_link"/>
+  </joint>
+
+  <!-- Sensors, plugins, control interfaces go here -->
+  <!-- Make sure to use the namespace prefix on plugin names, frames, and topics -->
+
+  
+  <link name="${namespace}/imu_link">
+    <inertial>
+      <origin xyz="-0.00552433659106688 0.000168210391520346 0.000514000497342681" rpy="0 0 0" />
+      <mass value="0.000528415362211671" />
+      <inertia ixx="1.46176048428261E-08" ixy="1.40015117949421E-10" ixz="-1.99633872937403E-12"
+               iyy="8.59662482954888E-09" iyz="7.52375112767959E-12"
+               izz="2.30279421279312E-08" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://bumperbot_description/meshes/imu_link.STL" />
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://bumperbot_description/meshes/imu_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="${namespace}/imu_joint" type="fixed">
+    <origin xyz="0 0 0.0698986241758014" rpy="0 0 0" />
+    <parent link="${namespace}/base_link" />
+    <child link="${namespace}/imu_link" />
+    <axis xyz="0 0 0" />
+  </joint>
+
+  <link name="${namespace}/laser_link">
+    <inertial>
+      <origin xyz="-0.011945780406062 -0.000381929217680526 -0.0170649378129477" rpy="0 0 0" />
+      <mass value="0.073084435549317" />
+      <inertia ixx="1.96074931730795E-05" ixy="-3.62091076640009E-07" ixz="4.28230084046735E-07"
+               iyy="2.40983835136327E-05" iyz="1.50180909250652E-08"
+               izz="4.14184164228595E-05" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://bumperbot_description/meshes/laser_link.STL" />
+      </geometry>
+      <material name="dark_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://bumperbot_description/meshes/laser_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="${namespace}/laser_joint" type="fixed">
+    <origin xyz="-0.0050526 -0.0023221 0.1208" rpy="0 0 3.14" />
+    <parent link="${namespace}/base_link" />
+    <child link="${namespace}/laser_link" />
+    <axis xyz="0 0 0" />
+  </joint>
+
+  <material name="blue">
+    <color rgba="0 0 1 1"/>
+  </material>
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+  <material name="silver">
+    <color rgba="0.79 0.82 0.93 1"/>
+  </material>
+  <material name="dark_grey">
+    <color rgba="0.3 0.3 0.3 1"/>
+  </material>
+
+</robot>

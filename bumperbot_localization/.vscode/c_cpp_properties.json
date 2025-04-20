@@ -1,0 +1,43 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/ferbin/hannah_ws/install/hannahbot_msgs/include/**",
+        "/home/ferbin/colcon_ws/install/realsense_gazebo_plugin/include/**",
+        "/home/ferbin/colcon_ws/install/linkattacher_msgs/include/**",
+        "/home/ferbin/wolf_ws/install/teleop_twist_joy/include/**",
+        "/home/ferbin/wolf_ws/install/imu_filter_madgwick/include/**",
+        "/home/ferbin/wolf_ws/install/imu_complementary_filter/include/**",
+        "/home/ferbin/shattie_ws/install/shattie_controller/include/**",
+        "/home/ferbin/zyberg_ws/install/serial_motor_demo_msgs/include/**",
+        "/home/ferbin/zyberg_ws/install/serial/include/**",
+        "/home/ferbin/zyberg_ws/install/rplidar_ros/include/**",
+        "/home/ferbin/zyberg_ws/install/diffdrive_arduino/include/**",
+        "/home/ferbin/selfdriving_bot/install/trajectory_logger/include/**",
+        "/home/ferbin/selfdriving_bot/install/bumperbot_cpp_examples/include/**",
+        "/home/ferbin/selfdriving_bot/install/bumperbot_msgs/include/**",
+        "/home/ferbin/selfdriving_bot/install/bumperbot_mapping/include/**",
+        "/home/ferbin/selfdriving_bot/install/bumperbot_localization/include/**",
+        "/home/ferbin/selfdriving_bot/install/bumperbot_controller/include/**",
+        "/opt/ros/humble/include/**",
+        "/home/ferbin/selfdriving_bot/src/bumperbot_controller/include/**",
+        "/home/ferbin/selfdriving_bot/src/bumperbot_cpp_examples/include/**",
+        "/home/ferbin/selfdriving_bot/src/bumperbot_firmware/include/**",
+        "/home/ferbin/selfdriving_bot/src/bumperbot_localization/include/**",
+        "/home/ferbin/selfdriving_bot/src/bumperbot_mapping/include/**",
+        "include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

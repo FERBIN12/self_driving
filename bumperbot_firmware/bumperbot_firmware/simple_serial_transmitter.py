@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from rclpy.node import Node
 from std_msgs.msg import String
 import serial
@@ -14,12 +16,13 @@ class Simple_Serial_traansmitter(Node):
         self.port_ = self.get_parameter("port").value
         self.baud_rate = self.get_parameter("baud_rate").value
 
-        self.arduino_ = serial.Serial(port= self.port_, baudrate= self.baud_rate, timeout= 0.1)
+        self.arduino_ = serial.Serial(port= self.port_, baudrate= self.baud_rate, timeout= 1.0)
         self.sub_ = self.create_subscription(String, "serial_transmitter",self.msg_cb, 10)
+        self.sub_
 
 
     def msg_cb(self, msg):
-        self.arduino_.write(msg.data.encode("utp-8"))
+        self.arduino_.write(msg.data.encode("utf-8"))
 
 def main():
     rclpy.init()
