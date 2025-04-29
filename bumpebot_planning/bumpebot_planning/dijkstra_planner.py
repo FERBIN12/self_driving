@@ -7,6 +7,26 @@ from geometry_msgs.msg import PoseStamped, Pose
 import rclpy.time
 from tf2_ros import TransformListener, Buffer, LookupException
 
+from queue import PriorityQueue
+
+
+# To perform the path planner we need graphNode class that wouldhelp us in proiortizing and creating and maintainning nodes
+class GraphNode():
+    def __init__(self, x, y, cost=0, prev = None):
+        self.x = x
+        self.y = y
+        self.cost= cost
+        self.prev = prev
+
+    def __lt__(self, other):
+        return self.cost < other.cost
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+    def __hash__(self):
+        return hash((self.x, self.y))
+    def __add__(self, other):
+        return GraphNode(self.x + other[0], self.y + other[1])
+
 class Dijkstra_planner(Node):
     def __init__(self):
         super().__init__("dijkstra_planner")
@@ -41,6 +61,8 @@ class Dijkstra_planner(Node):
     def goal_cb(self, goal_pose:PoseStamped):
         
         while(map):
+            self.visited_map.data = [-1] * (self.visited_map.info.height * self.visited_map.info.width)
+
             try:
                 map_to_base_tf = self.tf_buffer.lookup_transform(self.map.header.frame_id, "base_footprint", rclpy.time.Time())
             except LookupException:
@@ -56,7 +78,76 @@ class Dijkstra_planner(Node):
         self.path_pub.publish(path)
 
     def plan(self, start, goal):
-        pass
+        '''First we start by exploring in all directions so we set a list for that and a PQ for pending nodes and set of visited nodes'''
+        
+        explore_dirns = [(-1,0), (1,0), (0,1), (0,-1)]
+        pending_nodes = PriorityQueue()
+        visited_nodes = set()
+        '''To process the pose we got from the map, we need to convert the pose from world to grid (i.e World co-ords are received as continous values)
+            But for planner we need to descretize them so we convert them to descrete value using:: (robot.pose - map.pose)/ map.resolution]
+            This step is crucical because the planner is performed using map(Ocuupancy-grid) so it is crucial to convert them to grid '''
+        
+        start_node = self.world_to_grid(start)
+        # now we initialize the pending node
+        pending_nodes.put(start_node)
+        
+        # While function is excecutred untill the pending node is empty(i.e every grid explored)
+        while (pending_nodes.not_empty and rclpy.Ok()):
+            active_node = pending_nodes.get()
+            # we have a checker to check if the active node is the present node
+            if (active_node == self.world_to_grid(goal)):
+                break
+            # If the goal is not reached then we explore in every direction i.e) in the first loop 4 diff nodes are created
+            for dir_x, dir_y in explore_dirns:
+                newNode: GraphNode = active_node + (dir_x, dir_y)
+
+                # now We add another checker to check whether the newNode is present in the visited_node set and the newNode is on the map and the map data is empty(i.e) 0)
+                if newNode not in visited_nodes and  self.pose_on_map(newNode) and self.map.data[self.pose_to_cell(newNode) == 0]:
+                    # We set the cost between each node to be 1
+                    newNode.cost = active_node.cost + 1
+                    # here we update the prev pointer of newNode to keep in track of the path followed by our planner
+                    newNode.prev = active_node
+                    pending_nodes.put(newNode) # since we are performing dijkstra we gotta keep in track of the nodes we didn't explore or else it would be left un-explored
+                    visited_nodes.add(newNode)
+            # now the node that we explored are added to the visited_map and the value 10 just means that we have travelled in it.
+            self.visited_map.data[self.pose_to_cell(active_node)] = 10
+            self.map_pub.publish(self.visited_map)
+        # while loop comes out when the pending node becomes empty
+        path = Path()
+        path.header.frame_id = self.map.header.frame_id
+
+        'this loop is exccuted when the goal is reached and is back tracked untill the active_node.prev reaches nullptr'
+        while active_node and active_node.prev and rclpy.ok():
+            last_pose: Pose = self.grid_to_world(active_node)
+            last_pose_stamped = PoseStamped()
+            last_pose_stamped.header.frame_id = self.map.header.frame_id
+            last_pose_stamped.pose = last_pose
+            path.poses.append(last_pose_stamped)
+            active_node = active_node.prev
+        path.poses.reverse(active_node)
+        return path 
+
+    def world_to_grid(self, pose: Pose) -> GraphNode:
+        grid_x = int ((pose.position.x - self.map.info.origin.position.x) / self.map.info.resolution)
+        grid_y = int ((pose.position.y - self.map.info.origin.position.y) / self.map.info.resolution)
+        return GraphNode(grid_x, grid_y)
+    
+    def grid_to_world(self, node: GraphNode) -> Pose:
+        pose = Pose()
+        pose.position.x = node.x * self.map.info.resolution + self.map.info.origin.x
+        pose.position.y = node.y * self.map.info.resolution + self.map.info.origin.y
+        return pose
+
+    # tho I'm not sure abut it ig we are considering the map to be square so that x and y will stay inside the width
+    def pose_on_map(self, node: GraphNode):
+        return 0 <= node.x < self.map.info.width and 0 <= node.y < self.map.info.width
+    
+    ''' This fn trivial coz Ocuuucpancy grid in nav_msgs process the map as 1d matrix but our node has data in 2D (x,y)
+    So we use index = y* width + x'''
+
+    def pose_to_cell(self, node:GraphNode):
+        return node.y * self.map.info.width + node.x 
+        
 
 def main():
     rclpy.init()
