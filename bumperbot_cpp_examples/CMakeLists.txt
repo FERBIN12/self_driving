@@ -17,10 +17,6 @@ find_package(geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
-find_package(visualization_msgs REQUIRED)
-find_package(std_srvs REQUIRED)
-find_package(nav_msgs REQUIRED)
-
 
 include_directories(include)
 
@@ -53,12 +49,6 @@ ament_target_dependencies(simple_qos_publisher rclcpp std_msgs)
 
 add_executable(simple_qos_subscriber src/simple_qos_subscriber.cpp)
 ament_target_dependencies(simple_qos_subscriber rclcpp std_msgs)
-
-add_executable(try_pub src/try_pub.cpp)
-ament_target_dependencies(try_pub rclcpp nav_msgs visualization_msgs tf2 tf2_ros)
-
-add_executable(trajectory_recorder src/trajectory_recorder.cpp)
-ament_target_dependencies(trajectory_recorder rclcpp visualization_msgs std_srvs)
 
 add_library(simple_action_server SHARED src/simple_action_server.cpp)
 target_include_directories(simple_action_server PRIVATE
@@ -108,8 +98,6 @@ install(TARGETS
   simple_lifecycle_node
   simple_qos_publisher
   simple_qos_subscriber
-  trajectory_recorder
-  try_pub
   DESTINATION lib/${PROJECT_NAME}
 )
 

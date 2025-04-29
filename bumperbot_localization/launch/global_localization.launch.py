@@ -79,7 +79,7 @@ def generate_launch_description():
         map_name_arg,
         use_sim_time_arg,
         amcl_config_arg,
-        #nav2_map_server,
-        #nav2_amcl,
-        #nav2_lifecycle_manager,
+        nav2_map_server,
+        nav2_amcl,
+        nav2_lifecycle_manager,
     ])

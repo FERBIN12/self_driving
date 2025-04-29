@@ -1,26 +1,27 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <libserial/SerialPort.h>
 
 #include <chrono>
 
+#include <libserial/SerialPort.h>
 
 using namespace std::chrono_literals;
+
 
 class SimpleSerialReceiver : public rclcpp::Node
 {
 public:
-SimpleSerialReceiver() : Node("simple_serial_receiver")
+  SimpleSerialReceiver() : Node("simple_serial_receiver")
   {
     declare_parameter<std::string>("port", "/dev/ttyUSB0");
 
     port_ = get_parameter("port").as_string();
 
-    pub_ = create_publisher<std_msgs::msg::String>("chatter", 10);
-    timer_ = create_wall_timer(0.01s, std::bind(&SimpleSerialReceiver::timerCallback, this));
-    RCLCPP_INFO(get_logger(), "Publishing at 1 Hz");
     arduino_.Open(port_);
     arduino_.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
+
+    pub_ = create_publisher<std_msgs::msg::String>("serial_receiver", 10);
+    timer_ = create_wall_timer(0.01s, std::bind(&SimpleSerialReceiver::timerCallback, this));
   }
 
   ~SimpleSerialReceiver()
@@ -28,15 +29,14 @@ SimpleSerialReceiver() : Node("simple_serial_receiver")
     arduino_.Close();
   }
 
-
   void timerCallback()
   {
-    auto message = std_msgs::msg::String();
-    if (rclcpp::ok() && arduino_.IsDataAvailable())
-     {
+    if(rclcpp::ok() && arduino_.IsDataAvailable())
+    {
+      auto message = std_msgs::msg::String();
       arduino_.ReadLine(message.data);
-     }
-     pub_->publish(message);
+      pub_->publish(message);
+    }
   }
 
 private:
@@ -44,7 +44,6 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   std::string port_;
   LibSerial::SerialPort arduino_;
-  
 };
 
 

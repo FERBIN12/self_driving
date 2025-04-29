@@ -106,7 +106,7 @@ def generate_launch_description():
         joystick,
         safety_stop,
         localization,
-        #slam,
-        # rviz_localization,
-        # rviz_slam
+        slam,
+        rviz_localization,
+        rviz_slam
     ])
