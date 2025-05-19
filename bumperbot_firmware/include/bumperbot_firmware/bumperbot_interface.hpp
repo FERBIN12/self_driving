@@ -22,7 +22,7 @@ public:
     virtual callback_return on_activate(const rclcpp_lifecycle::State & prev_state) override;
     virtual callback_return on_deactivate(const rclcpp_lifecycle::State & prev_state) override;
 
-    virtual callback_return on_init(const hardware_interface::HardwareInfo & hanrdware_info) override;
+    virtual callback_return on_init(const hardware_interface::HardwareInfo & hardware_info) override;
     virtual std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
     virtual std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
 
@@ -40,4 +40,4 @@ private:
 
 };
 
-}
+}   

@@ -1,4 +1,6 @@
 #include "bumperbot_firmware/bumperbot_interface.hpp"
+#include <hardware_interface/types/hardware_interface_type_values.hpp>
+
 
 namespace bumperbot_interface{
 
@@ -17,5 +19,54 @@ BumperbotInterface::~BumperbotInterface(){
         }
     }
 }
+callback_return BumperbotInterface::on_init(const hardware_interface::HardwareInfo & hardwareinfo){
 
+    CallbackReturn result = hardware_interface::SystemInterface::on_init(hardwareinfo);
+
+    if (result != CallbackReturn::SUCCESS){
+            return result;
+    }
+    try
+    {
+        port_ = info_.hardware_parameters.at("port");
+    }
+    catch(const std::out_of_range & e)
+    {
+        RCLCPP_FATAL(rclcpp::get_logger("BumperbotInterface"), "No Serial port is provided! ABORTING!!");
+    }
+
+    velocity_commands_.reserve(info_.joints.size());
+    position_states_.reserve(info_.joints.size());
+    velocity_states_.reserve(info_.joints.size());
+
+    return CallbackReturn::SUCCESS;
+}
+
+std::vector<hardware_interface::StateInterface> BumperbotInterface::export_state_interfaces(){
+    
+    std::vector<hardware_interface::StateInterface> state_interfaces;
+
+    for(size_t i=0; i < info_.joints.size(); i++){
+        state_interfaces.emplace_back(hardware_interface::StateInterface(info_.joints.at(i).name, 
+            hardware_interface::HW_IF_POSITION, &position_states_.at(i))); 
+
+        state_interfaces.emplace_back(hardware_interface::StateInterface(info_.joints.at(i).name, 
+            hardware_interface::HW_IF_VELOCITY, &velocity_states_.at(i))); 
+    }
+
+    return state_interfaces;
+}
+
+std::vector<hardware_interface::CommandInterface> BumperbotInterface::export_command_interfaces(){
+    
+    std::vector<hardware_interface::CommandInterface> command_interfaces;
+
+    for(size_t i=0; i < info_.joints.size(); i++){
+        command_interfaces.emplace_back(hardware_interface::CommandInterface(info_.joints.at(i).name, 
+            hardware_interface::HW_IF_VELOCITY, &velocity_commands_.at(i))); 
+
+    }
+
+    return command_interfaces;
+}
 }
