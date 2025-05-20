@@ -69,4 +69,29 @@ std::vector<hardware_interface::CommandInterface> BumperbotInterface::export_com
 
     return command_interfaces;
 }
+
+callback_return BumperbotInterface::on_activate(const rclcpp_lifecycle::State & prev_state){
+    RCLCPP_INFO(rclcpp::get_logger("BumperbotInterface"), "Starting robot hardware!!");
+
+    velocity_commands_ = {0.0, 0.0, 0.0, 0.0};
+    position_states_ = {0.0, 0.0, 0.0, 0.0};
+    velocity_states_ = {0.0, 0.0, 0.0, 0.0};
+
+    try
+    {
+        arduino_.Open(port_);
+        arduino_.SetBaudRate(LibSerial::BaudRate::BAUD_115200); 
+    }
+    catch(...)
+    {
+        RCLCPP_FATAL_STREAM(rclcpp::get_logger("BumperbotInterface"), "Something went wrong when interacting with port:=" << port_);
+        return CallbackReturn::FAILURE;
+
+    }
+    
+    RCLCPP_INFO(rclcpp::get_logger("BumperbotInterface"), "Hardware connected successfully!!, READY TO INITIALLIZE");
+
+
+
+}
 }
