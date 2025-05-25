@@ -38,7 +38,7 @@ def generate_launch_description():
             os.path.join(
                 get_package_share_directory("bumperbot_controller"),
                 "config",
-                "bumperbot_controllers.yaml",
+                "bumperbot_controllers_hardware.yaml",
             ),
         ],
     )
